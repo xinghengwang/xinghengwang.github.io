@@ -201,6 +201,52 @@
 	<script src="http://localhost:4000/assets/js/util.js"></script>
 	<!--[if lte IE 8]><script src="http://localhost:4000/assets/js/ie/respond.min.js"></script><![endif]-->
 	<script src="http://localhost:4000/assets/js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@growthbook/growthbook/dist/bundles/index.js"></script>
+  <script>
+    function initGrowthBook() {
+  const { GrowthBook } = window.growthbook;
+
+
+
+  const growthbook = new GrowthBook({
+    apiHost: "https://cdn.growthbook.io",
+    clientKey: "sdk-UfRZuOTFkYjSvja",
+    enableDevMode: true,
+    subscribeToChanges: true,
+    trackingCallback: (experiment, result) => {
+      // TODO: Use your real analytics tracking system
+      console.log("Viewed Experiment", {
+        experimentId: experiment.key,
+        variationId: result.key
+      });
+    }
+  });
+
+
+  window.growthb = growthbook;
+  return growthbook.loadFeatures();
+}
+
+if (window.growthbook) {
+  console.log('here');
+
+  initGrowthBook().then(() => {
+    if (window.growthb.isOn("cta-label-1")) {
+      console.log("cta-label-1 is enabled after!")
+    } else {
+      console.log('no on here either');
+    }
+  });
+
+  if (window.growthb.isOn("cta-label-1")) {
+    console.log("cta-label-1 is enabled!")
+  } else {
+    console.log('not on');
+  }
+
+}
+
+  </script>
 
 
 </body>

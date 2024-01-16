@@ -14,6 +14,10 @@
 	<link rel="stylesheet" href="/assets/css/main.css" />
 	<!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie9.css" /><![endif]-->
 	<!--[if lte IE 8]><link rel="stylesheet" href="/assets/css/ie8.css" /><![endif]-->
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_8JkXFRI5DEYWM6thkqreij9sWXJv1Wb7jsbTz0dbOS9',{api_host:'https://app.posthog.com'})
+  </script>
 </head>
 
 
@@ -566,7 +570,7 @@ print 'It took ' + i + ' iterations to sort the deck.';
 			<ul class="copyright">
 				<li>&copy; About me </li>
 				<li>Design: <a href="https://html5up.net" target="_blank">HTML5 UP</a></li>
-				<li>Xing</li>
+				<li id="test-xing-name">Xing</li>
 			</ul>
 		</div>
 	</footer>
@@ -581,6 +585,90 @@ print 'It took ' + i + ' iterations to sort the deck.';
 	<script src="http://localhost:4000/assets/js/util.js"></script>
 	<!--[if lte IE 8]><script src="http://localhost:4000/assets/js/ie/respond.min.js"></script><![endif]-->
 	<script src="http://localhost:4000/assets/js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@growthbook/growthbook/dist/bundles/index.js"></script>
+  <script>
+    function initGrowthBook() {
+  const { GrowthBook } = window.growthbook;
+
+
+
+  const growthbook = new GrowthBook({
+    apiHost: "https://cdn.growthbook.io",
+    clientKey: "sdk-UfRZuOTFkYjSvja",
+    enableDevMode: true,
+    subscribeToChanges: true,
+    trackingCallback: (experiment, result) => {
+      // TODO: Use your real analytics tracking system
+      console.log("Viewed Experiment", {
+        experimentId: experiment.key,
+        variationId: result.key
+      });
+    }
+  });
+
+
+  window.growthb = growthbook;
+  return growthbook.loadFeatures();
+}
+
+if (window.growthbook) {
+  console.log('here');
+
+  initGrowthBook().then(() => {
+    if (window.growthb.isOn("cta-label-1")) {
+      console.log("cta-label-1 is enabled after!")
+    } else {
+      console.log('no on here either');
+    }
+  });
+
+  if (window.growthb.isOn("cta-label-1")) {
+    console.log("cta-label-1 is enabled!")
+  } else {
+    console.log('not on');
+  }
+
+}
+
+  </script>
+  <script>
+    const featureFlagsToProcess = [
+  {
+    key: "test-xing-name",
+    elementId: "test-xing-name",
+    override_text: "My George"
+  }
+];
+
+posthog.onFeatureFlags(function () {
+  // feature flags should be available at this point
+  featureFlagsToProcess.forEach((entry) => {
+    try {
+      if (posthog.isFeatureEnabled(entry.key)) {
+        var element = document.getElementById(entry.elementId || entry.key);
+        if (element) {
+          // if we don't find element we don't do anything.
+          if (entry.override_text) {
+            element.textContent = entry.override_text;
+          } else {
+            // try to get text from payload
+            posthog.getFeatureFlagPayload(entry.key).then((payload) => {
+              console.log("payload " + JSON.stringify(payload));
+              if (payload && payload.text) {
+                element.textContent = payload.text;
+              }
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.log("error processing " + entry.key);
+      console.error(err);
+    }
+  });
+});
+
+  </script>
 
 
 </body>
